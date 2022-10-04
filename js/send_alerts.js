@@ -160,5 +160,5 @@ function trigger(){
         }
     }
     setTimeout(function() { sendAlert(awsAlertPayload); }, 6000);
-
+    // test comment - will this work???
 }
