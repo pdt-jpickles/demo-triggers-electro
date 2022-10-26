@@ -6,9 +6,7 @@ function checkout() {
 //    sendViaCrux(CRUX_EVENT_GROUP_ID)
 //    console.log('**************************************')
     trigger()
-
 //    setTimeout(loadPage, 5500);
-
 }
 
 function sendViaCrux(eventGroupId){
@@ -24,12 +22,13 @@ function sendViaCrux(eventGroupId){
     });
 }
 
-function sendAlert(payload, images = []){
+function sendAlert(payload, dedup_key, images = []){
     var eventObject = {
         "routing_key":"R028NKU41PQGYB4TQTEUZ8GRN15ME9HF",
         "dedup_key": new Date() + new Date().getTime(),
         "event_action": "trigger",
         "payload": payload,
+        "dedup_key": dedup_key,
         "images": images
     }
     console.log(eventObject)
@@ -60,21 +59,36 @@ function sendAlert(payload, images = []){
 //    });
 //}
 
-function trigger(){
+function sendChangeEvent(){
+    // Send code change event
+    sendViaCrux("474a7ca4-1439-4308-8441-9f1c8c82915a")
+}
 
+function trigger(){
+    // Now send alert storm...
     // New Relic alert
     var newRelicPayload = {
          "summary": "[Critical] Increased response time detected on Checkout page, High Error rates",
          "source": "New Relic",
          "severity": "critical",
-         "component": "Checkout"
+         "component": "Checkout",
+         "custom_details": {
+             "Priority": "Highest",
+             "event_id": "0f5bfc9928a260678",
+             "body": "[Critical] Increased response time detected on Checkout page, High Error rates <br/> Object Reference Not Set and ADO.NET Connection pool exceeded errors detected",
+             "tags": ["aws-prod", "base", "env:prod", "host:farnsworth", "monitor", "pd_az:us-west-2c", "production", "xdb", "xtradb"],
+             "AWSAccountId": "84862478935",
+             "NewStateValue": "ALARM",
+             "OldStateValue": "INSUFFICIENT_DATA",
+             "Region": "US West (N. California)"
+         }
     }
     var newRelicImages = [{
         "src": "https://pdt-gurinder.s3.amazonaws.com/images/metrics/NRErrors2.png"
     }]
-    sendAlert(newRelicPayload, newRelicImages)
-    setTimeout(function() { sendAlert(newRelicPayload, newRelicImages); }, 5000); // send again in 5 seconds
-    setTimeout(function() { sendAlert(newRelicPayload, newRelicImages); }, 10000); // and again in 10 seconds
+    sendAlert(newRelicPayload, "NewRelic1", newRelicImages)
+    setTimeout(function() { sendAlert(newRelicPayload, "NewRelic2", newRelicImages); }, 5000); // send again in 5 seconds
+    setTimeout(function() { sendAlert(newRelicPayload, "NewRelic3", newRelicImages); }, 10000); // and again in 10 seconds
 
 
     // Mongo alert
@@ -85,7 +99,7 @@ function trigger(){
         "component": "Inventory",
         "group": "MongoDB"
     }
-    setTimeout(function() { sendAlert(mongoAlertPayload); }, 1000);
+    setTimeout(function() { sendAlert(mongoAlertPayload, "Mongo"); }, 1000);
 
 
     // Solarwinds alert
@@ -96,7 +110,7 @@ function trigger(){
         "component": "Inventory",
         "group": "Inventory-API"
     }
-    setTimeout(function() { sendAlert(solarAlertPayload); }, 1000);
+    setTimeout(function() { sendAlert(solarAlertPayload, "Solarwinds"); }, 1000);
 
 
     // Prometheus alert
@@ -106,10 +120,10 @@ function trigger(){
         "severity": "warning",
         "component": "Payments"
     }
-    setTimeout(function() { sendAlert(promAlertPayload); }, 1000);
-    setTimeout(function() { sendAlert(promAlertPayload); }, 6000);
-    setTimeout(function() { sendAlert(promAlertPayload); }, 11000);
-    setTimeout(function() { sendAlert(promAlertPayload); }, 16000);
+    setTimeout(function() { sendAlert(promAlertPayload, "Prometheus1"); }, 1000);
+    setTimeout(function() { sendAlert(promAlertPayload, "Prometheus2"); }, 6000);
+    setTimeout(function() { sendAlert(promAlertPayload, "Prometheus3"); }, 11000);
+    setTimeout(function() { sendAlert(promAlertPayload, "Prometheus4"); }, 16000);
 
 
     // AWS alert
@@ -130,7 +144,7 @@ function trigger(){
           "Region": "US West (N. California)"
         }
     }
-    setTimeout(function() { sendAlert(awsAlertPayload); }, 1000);
+    setTimeout(function() { sendAlert(awsAlertPayload, "AWS"); }, 1000);
 
 
     // Solarwinds 2 alert
@@ -140,7 +154,7 @@ function trigger(){
         "severity": "critical",
         "component": "Checkout"
     }
-    setTimeout(function() { sendAlert(awsAlertPayload); }, 2000);
+    setTimeout(function() { sendAlert(solar2AlertPayload, "Solarwinds2"); }, 2000);
 
 
     // Datadog alert
@@ -159,6 +173,10 @@ function trigger(){
           "Region": "US East (NY)"
         }
     }
-    setTimeout(function() { sendAlert(awsAlertPayload); }, 6000);
-    // test comment - will this work???
+    setTimeout(function() { sendAlert(datadogAlertPayload, "Datadog1"); }, 2000);
+    setTimeout(function() { sendAlert(datadogAlertPayload, "Datadog2"); }, 4000);
+    setTimeout(function() { sendAlert(datadogAlertPayload, "Datadog3"); }, 6000);
+
 }
+
+//trigger()
