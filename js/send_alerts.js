@@ -1,4 +1,5 @@
-var CRUX_EVENT_GROUP_ID = '082e7745-47f7-4e28-9cba-aa7480e0d526'
+const CRUX_EVENT_GROUP_ID = '082e7745-47f7-4e28-9cba-aa7480e0d526'
+const GLOBAL_ORCH_KEY = "R028NKU41PQGYB4TQTEUZ8GRN15ME9HF"
 
 function checkout() {
 
@@ -22,7 +23,7 @@ function sendViaCrux(eventGroupId){
     });
 }
 
-function sendAlert(eventObject, dedup_key, integration_key = "R028NKU41PQGYB4TQTEUZ8GRN15ME9HF"){
+function sendAlert(eventObject, dedup_key, integration_key = GLOBAL_ORCH_KEY) {
 //    var eventObject = {
 //        "routing_key":"R028NKU41PQGYB4TQTEUZ8GRN15ME9HF",
 //        "event_action": "trigger",
